@@ -15,21 +15,22 @@ public class LotteryDrawMain {
 	int screenWidth = 0;
 	int screenHeight = 0;
 	
-	// Í¼Æ¬ÇĞ»»¼ä¸ôÊ±¼ä ms
+	// å›¾ç‰‡åˆ‡æ¢é—´éš”æ—¶é—´ ms
 	final static int DURATION = 50;
-	// Í¼Æ¬ÏÔÊ¾ÇøÓò×óÓÒ±ß¾à
+	// å›¾ç‰‡æ˜¾ç¤ºåŒºåŸŸå·¦å³è¾¹è·
 	final static int DISPLAY_MARGIN = 20;
-	// Í¨ÓÃ±ß¾à
+	// é€šç”¨è¾¹è·
 	final static int MARGIN = 10;
-	// °´¼ü¿í¶È
+	// æŒ‰é”®å®½åº¦
 	final static int BUTTON_WIDTH = 200;
-	// ½á¹û¿ò¿í¶È
+	// ç»“æœæ¡†å®½åº¦
 	final static int RESULT_WIDTH = 400;
-	// °´¼üºÍ½á¹û¿ò¹«ÓÃ¸ß¶È
+	// æŒ‰é”®å’Œç»“æœæ¡†å…¬ç”¨é«˜åº¦
 	final static int DOWN_HEIGHT = 100;
 
 	JPanel mainPanel, selectPanel, displayPanel, resultPanel;
-	
+	JLabel phaseIconLabel = null, phaseResult = null, phaseBlank1 = null, phaseBlank2 = null; 
+
 	//Constructor
 	public LotteryDrawMain() {
 		
@@ -44,7 +45,7 @@ public class LotteryDrawMain {
 		mainPanel.add(displayPanel);
 		mainPanel.add(resultPanel);
 		
-		//Ìí¼Ó²å¼ş£¬¶ÁÈ¡ËùÓĞÍ¼Æ¬ÈëÊı×é
+		//æ·»åŠ æ’ä»¶ï¼Œè¯»å–æ‰€æœ‰å›¾ç‰‡å…¥æ•°ç»„
 		addWidgets();
 	}
 	
@@ -56,16 +57,16 @@ public class LotteryDrawMain {
 	
 	private void setPanelsSize() {
 		int x, y, w, h = 0;
-		//³é½±°´Å¥ÇøÃæ°å
+		//æŠ½å¥–æŒ‰é’®åŒºé¢æ¿
 		selectPanel = new JPanel();
-		//³é½±ºÍÔİÍ£°´Å¥¼ü
+		//æŠ½å¥–å’Œæš‚åœæŒ‰é’®é”®
 		x = screenWidth / 2 - BUTTON_WIDTH;
 		y = screenHeight - MARGIN * 2 - DOWN_HEIGHT;
 		w = BUTTON_WIDTH;
 		h = DOWN_HEIGHT;
 		selectPanel.setBounds(x, y, w, h);
 		
-		//Í¼Æ¬ÏÔÊ¾ÇøÓòÃæ°å
+		//å›¾ç‰‡æ˜¾ç¤ºåŒºåŸŸé¢æ¿
 		displayPanel = new JPanel();
 		
 		x = DISPLAY_MARGIN;
@@ -74,7 +75,7 @@ public class LotteryDrawMain {
 		h = screenHeight - DOWN_HEIGHT - MARGIN * 3;
 		displayPanel.setBounds(x, y, w, h);
 		
-		//»ñ½±ÏÔÊ¾ÇøÓòÃæ°å
+		//è·å¥–æ˜¾ç¤ºåŒºåŸŸé¢æ¿
 		resultPanel = new JPanel();
 		x = screenWidth / 2 + MARGIN;
 		y = screenHeight - MARGIN * 2 - DOWN_HEIGHT;
@@ -85,6 +86,27 @@ public class LotteryDrawMain {
 	}
 	
 	private void addWidgets() {
+		//è¯»å–å›¾ç‰‡ 
+		readImagesToArrays();
+		
+		//use JLabel to display the photo
+		phaseIconLabel = new JLabel();
+		phaseIconLabel.setHorizontalAlignment(JLabel.CENTER);
+		phaseIconLabel.setVerticalAlignment(JLabel.CENTER);
+		phaseIconLabel.setVerticalTextPosition(JLabel.CENTER);
+		phaseIconLabel.setHorizontalTextPosition(JLabel.CENTER);
+		phaseIconLabel.setBorder(BorderFactory.createCompoundBorder(
+			BorderFactory.createLoweredBevelBorder(),
+			BorderFactory.createEmptyBorder(1, 1, 1, 1)));
+		
+		phaseResult = new JLabel(); 
+ 		phaseBlank1 = new JLabel(); 
+ 		phaseBlank2 = new JLabel();
+ 		
+ 		
+
+		
+		
 		
 	}
 	public static void main(String[] args) {
@@ -92,7 +114,7 @@ public class LotteryDrawMain {
 		LotteryDrawMain lot = new LotteryDrawMain();
 		
 		//set UI
-		JFrame frame = new JFrame("³é½±À²");
+		JFrame frame = new JFrame("æŠ½å¥–å•¦");
 		
 		frame.setContentPane(lot.mainPanel);
 		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
