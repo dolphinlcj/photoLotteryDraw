@@ -103,7 +103,8 @@ public class LotteryDrawMain {
  		phaseBlank1 = new JLabel(); 
  		phaseBlank2 = new JLabel();
  		
- 		
+ 		//创建控制按键
+ 		phaseChoice = new JButton("开始/停止");
 
 		
 		
