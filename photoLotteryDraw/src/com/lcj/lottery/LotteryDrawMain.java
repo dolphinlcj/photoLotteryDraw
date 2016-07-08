@@ -2,9 +2,17 @@ package com.lcj.lottery;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 
 /**
  * @version 1.0
@@ -30,8 +38,22 @@ public class LotteryDrawMain {
 
 	JPanel mainPanel, selectPanel, displayPanel, resultPanel;
 	
+	// 抽奖控制按键
+	JButton phaseChoice = null;
+	// 显示结果标签
+	JLabel phaseIconLabel = null, phaseResult = null, phaseBlank1 = null,
+				phaseBlank2 = null;
+	//工作目录
+	String rootDir = new StringBuffer(System.getProperty("user.dir")).
+			append(File.separator).toString();
+	
+	//图片目录
+	final static String IMAGE_DIR = "images/";
+	final static String WINNER_DIR = "winners/";
+	final static String WELCOME_IMAGE = "welcome/start.jpg";
+	
 	//Constructor
-	public LotteryDrawMain() {
+	public LotteryDrawMain() throws IOException {
 		
 		checkScreenSize();
 		
@@ -83,11 +105,71 @@ public class LotteryDrawMain {
 		resultPanel.setBounds(x, y, w, h);
 		
 	}
-	
-	private void addWidgets() {
+	private void readImagesToArrays()
+	{
 		
 	}
-	public static void main(String[] args) {
+	private void addWidgets() throws IOException {
+		//read image array
+		readImagesToArrays();
+		phaseIconLabel = new JLabel();
+		phaseIconLabel.setHorizontalAlignment(JLabel.BOTTOM);
+		phaseIconLabel.setVerticalAlignment(JLabel.BOTTOM);
+		phaseIconLabel.setHorizontalTextPosition(JLabel.BOTTOM);
+		phaseIconLabel.setHorizontalTextPosition(JLabel.BOTTOM);
+		phaseIconLabel.setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createLoweredBevelBorder(),
+				BorderFactory.createEmptyBorder(1, 1, 1, 1)));
+		
+		phaseResult = new JLabel();
+		phaseBlank1 = new JLabel();
+		phaseBlank2 = new JLabel();
+		
+		//create control button
+		phaseChoice = new JButton("开始/停止");
+		
+		//display the first welcome photo
+		ImageIcon icon = null;
+		String fileName = new StringBuffer(rootDir).append(WELCOME_IMAGE).toString();
+		
+		try {
+			icon = new ImageIcon(ImageIO.read(new File(fileName)));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			throw new IOException(new StringBuffer("ImageIO读取图片文件失败 : ")
+			.append(fileName).append(", 不是jpg图片格式？").toString());
+		}
+		
+		phaseIconLabel.setIcon(icon);
+		phaseIconLabel.setText("");
+		
+		// 各区域设置边框
+		selectPanel.setBorder(BorderFactory.createCompoundBorder(
+					BorderFactory.createTitledBorder("操作区"),
+					BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+
+		resultPanel.setBorder(BorderFactory.createCompoundBorder(
+					BorderFactory.createTitledBorder("结果区"),
+					BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+		// 图片区域设置边框
+		displayPanel.setBorder(BorderFactory.createCompoundBorder(
+					BorderFactory.createTitledBorder("照片列表"),
+					BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+		
+		//显示板上添加各组件
+		selectPanel.add(phaseChoice);
+		displayPanel.add(phaseIconLabel);
+		resultPanel.add(phaseBlank1);
+		resultPanel.add(phaseResult);
+		resultPanel.add(phaseBlank2);
+		
+		//给控制按键设置监听器
+		//phaseChoice.addActionListener(this);
+		
+		
+		
+	}
+	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		LotteryDrawMain lot = new LotteryDrawMain();
 		
