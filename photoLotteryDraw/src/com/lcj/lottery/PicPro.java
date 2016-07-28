@@ -3,16 +3,21 @@ package com.lcj.lottery;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -120,13 +125,121 @@ public class PicPro extends WindowAdapter implements ActionListener {
 		// TODO Auto-generated method stub
 		if(e.getSource() == button)
 		{
+			flag_num = false;
+			if (checkNum(tf3.getText()) == true && checkNum(tf4.getText())) {
+				width = (int) Double.parseDouble(tf3.getText());
+				height = (int) Double.parseDouble(tf4.getText());
+				flag_num = true;
+			}else {
+				flag_num = false;
+				ta.append("XY填写格式不正确,请重新填写 \n");
+			}
 			
+			if(flag_in == true && flag_out == true && flag_num == true) {
+				ta.append("目标文件列表\n");
+				int cnt = 0;
+				for(int i = 0; i < filelist.length; i++) {
+					if(filelist[i] != wzw) {
+						File outTemp;
+						try {
+							RenderedImage im = convert(width, height, 
+									ImageIO.read(filelist[i]));
+							String outputFileName = filelist[i].getName();
+							String format = outputFileName.substring(
+									outputFileName.lastIndexOf('.') + 1);
+							outTemp = new File(fileout + "/" + outputFileName);
+							
+							if (outTemp.exists() == true) {
+								int restartChoose = JOptionPane.showConfirmDialog(frame, "有相同名称的文件，是否覆盖？", "提示",
+										JOptionPane.OK_CANCEL_OPTION);
+								if (restartChoose == JOptionPane.OK_OPTION) {
+									ImageIO.write(im, format, outTemp);
+									ta.append(outTemp.getAbsolutePath());
+									ta.append("\t\t" + "Finished" + "\n");
+									
+									cnt += 1;
+								}
+								else {
+									return;
+								}
+							}else {
+								ImageIO.write(im, format, outTemp);
+								ta.append(outTemp.getAbsolutePath());
+								ta.append("\t\t" + "Finished" + "\n");
+								cnt += 1;
+							}
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} catch (Exception e2) {
+							// TODO: handle exception
+							e2.printStackTrace();
+						}
+						
+					}
+				}
+				ta.append("目标文件共" + cnt + "个\n");
+			}
 		}
 		else if (e.getSource() == button1) {
+			flag_in = false;
+			filein = new File(tf1.getText());
 			
+			if(filein.exists() == true && filein.isDirectory() == true) {
+				ta.append("\n源文件夹填写格式正确");
+				flag_in = true;
+				filelist = filein.listFiles();
+				for (int i = 0; i < filelist.length; i++) {
+					if (filelist[i].isFile() == false) {
+						filelist[i] = wzw;
+					}
+				}
+				
+				String ispic;
+				for (int i = 0; i < filelist.length; i++) {
+					if(filelist[i] != wzw) {
+						String temp;
+						temp = filelist[i].getName();
+						ispic = temp.substring(temp.lastIndexOf('.') + 1);
+						if((ispic.equals("jpg") == false)
+								&& (ispic.equals("bmp") == false)
+								&& (ispic.equals("gif") == false)
+								&& (ispic.equals("png") == false)
+								&& (ispic.equals("JPG") == false)
+								&& (ispic.equals("BMP") == false)
+								&& (ispic.equals("GIF") == false)
+								&& (ispic.equals("PNG") == false)){
+							filelist[i] = wzw;
+						}
+					}
+				}
+				ta.append("源文件列表:\n");
+				int num = 0;
+				for(int i = 0; i < filelist.length; i++) {
+					if(filelist[i] != wzw) {
+						ta.append(filelist[i] + "\n");
+						num += 1;
+					}
+				}
+				ta.append("源文件共" + num + "个\n");
+				ta.append("\n");
+				
+			}else {
+				ta.append("\n源文件夹不存在或者输入格式错误！\n");
+				flag_in = false;
+			}
 		}
 		else if (e.getSource() == button2) {
-			
+			flag_out = false;
+			fileout = new File(tf2.getText());
+			if (fileout.exists() == true && fileout.isDirectory() == true) {
+				ta.append("目标文件夹填写格式正确\n");
+				flag_out = true;
+			}
+			else {
+				ta.append("\n目标文件夹不存在或者输入格式错误！\n");
+				flag_out = false;
+			}
 		}
 	}
 	
@@ -141,9 +254,28 @@ public class PicPro extends WindowAdapter implements ActionListener {
 	 * @param input
 	 * @return output
 	 */
-	public static BufferedImage convert(int width, int height, 
-			BufferedImage input) {
+	public static BufferedImage convert(int width, int height, BufferedImage input) {
+		
 		BufferedImage output = null;
+		double ratio = 1.0;
+		
+		if(input.getHeight() > height || input.getWidth() > width) {
+			if(input.getHeight() > input.getWidth()) {
+				ratio = (double) height / (double) input.getHeight();
+			} else {
+				ratio = (double) width / (double) input.getWidth();
+			}
+			
+			//compute the new width and height
+			int newWidth = (int)((double) input.getWidth() * ratio);
+			int newHeight = (int)((double) input.getHeight() * ratio);
+			
+			output = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+			output.getGraphics().drawImage(
+					input.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH), 0, 0, null);
+		}else {
+			output = input;
+		}
 		
 		return output;
 	}
