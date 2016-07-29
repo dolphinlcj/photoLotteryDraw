@@ -18,6 +18,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.lcj.lottery.util.CopyFile;
+
 /**
  * @version 1.0
  * @param dolphinlcj
@@ -232,6 +234,7 @@ public class LotteryDrawMain {
 		phaseChoice.addActionListener((ActionListener) this);
 	}
 	
+	 
 	private int random(int max) {
 		return (int)(Math.random() * real_num_images);
 	}
@@ -243,19 +246,77 @@ public class LotteryDrawMain {
 			run = false;
 			phaseBlank1.setText("恭喜");
 			phaseBlank2.setText("中奖啦！");
+			//delete image of winning the award
 			moveLuckImage(phaseResult.getText());
-		
-			readImagesToArrays();
+			
+			//重建图片文件列表
+			try {
+				readImagesToArrays();
+			} catch (IOException e) {
+				// TODO: handle exception
+				System.err.println(new StringBuffer("程序异常退出，" +
+						"可能是图片目录出现问题，请检查images目录是否存在，其中是否有图片 : ").append(e));
+				System.exit(1);
+			}
+			
 		}
 		else{
 			run = true;
+			new Thread() {
+				public void run() {
+					while(run) {
+						//随机显示图片
+						int index = random(real_num_images);
+						phaseIconLabel.setIcon(imageIcons.get(index));
+						phaseBlank1.setText("");
+						
+						//显示图片名称，不要扩展名
+						try {
+							String imageName = imageNames.get(index);
+							phaseResult.setText(imageName.substring(0, imageName.lastIndexOf('.')));
+							phaseBlank2.setText("");
+						} catch (Exception e) {
+							// TODO: handle exception
+							e.printStackTrace();
+							System.err.println(new StringBuffer
+									("出现错误，可能是随机抽的图片不存在 : ").append(e));
+							System.exit(1);
+						}
+						try {
+							Thread.sleep(DURATION);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+											
+					}
+				}
+			}.start();
 			
 		}
 	}
-	
+	/**
+	 * 删除获奖人照片
+	 * @param imageName
+	 */
 	private void moveLuckImage(String imageName) {
+		String imageFileName = new StringBuffer(imageName).append(".jpg").toString();
+		String srcFile = new StringBuffer(rootDir).append(IMAGE_DIR).append(imageFileName).toString();
 		
+		File file = new File(srcFile);
+		if (file.exists()) {
+			//先复制中奖照片到winning目录
+			String dstFile = srcFile.replaceAll(IMAGE_DIR, WINNER_DIR);
+			try {
+				CopyFile.copy(srcFile, dstFile);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			file.delete();
+		}
 	}
+	
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		LotteryDrawMain lot = new LotteryDrawMain();
